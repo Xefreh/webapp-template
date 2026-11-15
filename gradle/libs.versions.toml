@@ -1,0 +1,17 @@
+[plugins]
+node = { id = "com.github.node-gradle.node", version = "7.1.0" }
+shadow = { id = "com.gradleup.shadow", version = "9.6.1" }
+
+[versions]
+jetty = "12.1.14"
+freemarker = "2.3.35"
+junit = "5.13.4"
+slf4j = "2.0.20"
+
+[libraries]
+jetty-ee11-servlet = { module = "org.eclipse.jetty.ee11:jetty-ee11-servlet", version.ref = "jetty" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
