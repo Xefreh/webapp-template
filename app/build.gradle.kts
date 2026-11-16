@@ -13,8 +13,9 @@ repositories {
 dependencies {
     implementation(libs.jetty.ee11.servlet)
     implementation(libs.freemarker)
+    implementation(libs.slf4j.api)
     
-    runtimeOnly(libs.slf4j.simple)
+    runtimeOnly(libs.logback.classic)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)

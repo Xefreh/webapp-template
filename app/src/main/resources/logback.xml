@@ -1,0 +1,23 @@
+<configuration>
+
+	<!-- Silence Logback's own status messages at startup -->
+	<statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- Application code -->
+	<logger name="org.example" level="DEBUG" />
+
+	<!-- Noisy libraries -->
+	<logger name="org.eclipse.jetty" level="WARN" />
+	<logger name="freemarker" level="WARN" />
+
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+	</root>
+
+</configuration>
