@@ -27,10 +27,10 @@ public class LogFilter implements Filter {
 		boolean failed = false;
 		try {
 			chain.doFilter(request, response);
-		} catch (Exception e) {
+		} catch (Throwable t) {
 			failed = true;
-			log.error("Unhandled exception on {} {}", req.getMethod(), req.getRequestURI(), e);
-			throw e;
+			log.error("Unhandled exception on {} {}", req.getMethod(), req.getRequestURI(), t);
+			throw t;
 		} finally {
 			long elapsedMs = (System.nanoTime() - start) / 1_000_000;
 			int status = failed ? HttpServletResponse.SC_INTERNAL_SERVER_ERROR : res.getStatus();
