@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.EnumSet;
 import java.util.TimeZone;
 
 import org.eclipse.jetty.ee11.servlet.ResourceServlet;
@@ -8,12 +9,12 @@ import org.eclipse.jetty.ee11.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.ResourceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.servlet.DispatcherType;
 
 public class App {
 
@@ -33,6 +34,8 @@ public class App {
 		Server server = new Server(8080);
 
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		
+		context.addFilter(LogFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
 		context.setBaseResource(ResourceFactory.of(server).newClassLoaderResource("static"));
 		ServletHolder staticHolder = context.addServlet(ResourceServlet.class, "/assets/*");
