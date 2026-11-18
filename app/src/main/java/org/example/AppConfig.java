@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import java.util.function.Function;
 
 public class AppConfig {
 
@@ -46,11 +47,19 @@ public class AppConfig {
         }
         return value;
     }
+    
+    public int getInt(String key) {
+        return getNumber(key, Integer::parseInt);
+    }
 
     public long getLong(String key) {
+        return getNumber(key, Long::parseLong);
+    }
+
+    private <T extends Number> T getNumber(String key, Function<String, T> parser) {
         String value = get(key);
         try {
-            return Long.parseLong(value.trim());
+            return parser.apply(value.trim());
         } catch (NumberFormatException e) {
             throw new IllegalStateException("Config key '" + key + "' must be a number, got: '" + value + "'", e);
         }

@@ -17,7 +17,7 @@ public class Database implements AutoCloseable {
         hikariConfig.setSchema(appConfig.get("database.schema"));
         hikariConfig.setPoolName(appConfig.get("database.poolName"));
         hikariConfig.setConnectionTimeout(appConfig.getLong("database.connectionTimeout") * 1000);
-        hikariConfig.setMaximumPoolSize((int) appConfig.getLong("database.maximumPoolSize"));
+        hikariConfig.setMaximumPoolSize(appConfig.getInt("database.maximumPoolSize"));
         hikariConfig.addDataSourceProperty("ApplicationName", appConfig.get("database.applicationName"));
 
         this.dataSource = new HikariDataSource(hikariConfig);
