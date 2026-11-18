@@ -10,8 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class HelloServlet extends BaseServlet {
 
-	public HelloServlet(Configuration cfg) {
-		super(cfg);
+	public HelloServlet(Configuration freemarkerCfg) {
+		super(freemarkerCfg);
 	}
 
 	@Override

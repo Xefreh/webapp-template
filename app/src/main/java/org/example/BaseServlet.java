@@ -32,7 +32,7 @@ public class BaseServlet extends HttpServlet {
 			if (!response.isCommitted()) {
 				response.resetBuffer();
 			}
-			throw new ServletException("Erreur dans le template " + name, e);
+			throw new ServletException("Error in template " + name, e);
 		}
 	}
 }
