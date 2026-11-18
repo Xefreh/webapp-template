@@ -17,10 +17,14 @@ dependencies {
     implementation(libs.slf4j.api)
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
+    implementation(libs.jdbi3.core)
     implementation(libs.postgresql)
     implementation(libs.jackson.databind)
+    implementation(libs.spring.security.crypto)
+    runtimeOnly(libs.bcprov) // required by Argon2PasswordEncoder
     
     runtimeOnly(libs.logback.classic)
+    runtimeOnly(libs.jcl.over.slf4j) // commons-logging API used by spring-security-crypto, routed to SLF4J
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)

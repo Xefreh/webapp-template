@@ -10,6 +10,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.flywaydb.core.Flyway;
+import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,10 @@ public class App {
 		Runtime.getRuntime().addShutdownHook(new Thread(database::close));
 
 		Flyway.configure().dataSource(database.getDataSource()).locations("classpath:migrations").load().migrate();
+
+		Jdbi jdbi = Jdbi.create(database.getDataSource());
+		UserRepository userRepository = new UserRepository(jdbi);
+		PasswordHasher passwordHasher = new PasswordHasher();
 
 		Configuration cfg = new Configuration(Configuration.VERSION_2_3_35);
 
@@ -49,6 +54,7 @@ public class App {
 		ServletHolder staticHolder = context.addServlet(ResourceServlet.class, "/assets/*");
 		staticHolder.setInitParameter("pathInfoOnly", "false");
 
+		context.addServlet(new ServletHolder(new UserServlet(cfg, userRepository, passwordHasher)), "/users");
 		context.addServlet(new ServletHolder(new HelloServlet(cfg)), "/");
 
 		server.setHandler(context);
