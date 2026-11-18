@@ -9,6 +9,7 @@ import org.eclipse.jetty.ee11.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.ResourceFactory;
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,13 @@ public class App {
 	private static final Logger log = LoggerFactory.getLogger(App.class);
 
 	public static void main(String[] args) throws Exception {
+		AppConfig appConfig = AppConfig.load();
+
+		Database database = new Database(appConfig);
+		Runtime.getRuntime().addShutdownHook(new Thread(database::close));
+
+		Flyway.configure().dataSource(database.getDataSource()).locations("classpath:migrations").load().migrate();
+
 		Configuration cfg = new Configuration(Configuration.VERSION_2_3_35);
 
 		cfg.setClassForTemplateLoading(App.class, "/templates");
@@ -34,7 +42,7 @@ public class App {
 		Server server = new Server(8080);
 
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-		
+
 		context.addFilter(LogFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
 		context.setBaseResource(ResourceFactory.of(server).newClassLoaderResource("static"));

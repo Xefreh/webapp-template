@@ -13,7 +13,11 @@ repositories {
 dependencies {
     implementation(libs.jetty.ee11.servlet)
     implementation(libs.freemarker)
+    implementation(libs.hikaricp)
     implementation(libs.slf4j.api)
+    implementation(libs.flyway.core)
+    implementation(libs.flyway.database.postgresql)
+    implementation(libs.postgresql)
     implementation(libs.jackson.databind)
     
     runtimeOnly(libs.logback.classic)

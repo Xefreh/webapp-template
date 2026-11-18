@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      # Must match the database.* keys in app/src/main/resources/config.properties
+      POSTGRES_DB: webapptemplate
+      POSTGRES_USER: webapptemplate
+      POSTGRES_PASSWORD: webapptemplate
+    ports:
+      - "5432:5432"
+    volumes:
+      # PostgreSQL 18+ images store data under /var/lib/postgresql/<major>/docker
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webapptemplate -d webapptemplate"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
