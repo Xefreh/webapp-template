@@ -29,7 +29,6 @@ public class BaseServlet extends HttpServlet {
 
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/html");
-		response.setCharacterEncoding("UTF-8");
 
 		try {
 			template.process(model, response.getWriter());
@@ -52,7 +51,6 @@ public class BaseServlet extends HttpServlet {
 
 		response.setStatus(status);
 		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
 		response.setContentLength(body.length);
 		response.getOutputStream().write(body);
 	}

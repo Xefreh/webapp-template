@@ -47,6 +47,8 @@ public class App {
 		Server server = new Server(8080);
 
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		context.setDefaultRequestCharacterEncoding("UTF-8");
+		context.setDefaultResponseCharacterEncoding("UTF-8");
 
 		context.addFilter(LogFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
