@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.jetty.ee11.servlet)
     implementation(libs.freemarker)
     implementation(libs.slf4j.api)
+    implementation(libs.jackson.databind)
     
     runtimeOnly(libs.logback.classic)
 
