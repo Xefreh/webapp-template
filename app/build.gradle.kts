@@ -64,6 +64,11 @@ tasks.processResources {
 }
 
 tasks.shadowJar {
+    // Keep every duplicate service file so mergeServiceFiles() can merge them
+    // (the default EXCLUDE strategy drops them first, e.g. Flyway's database plugins).
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
     mergeServiceFiles()
 }
 
