@@ -18,5 +18,19 @@ services:
       timeout: 3s
       retries: 10
 
+  # Started only with `docker compose --profile app up`, so that `docker compose up`
+  # keeps starting PostgreSQL alone for `./gradlew run` (both listen on port 8080).
+  app:
+    build: .
+    profiles: [app]
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/webapptemplate
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres-data:

@@ -34,6 +34,12 @@ To build a standalone jar:
 java -jar app/build/libs/app-all.jar
 ```
 
+To build the Docker image and run it with PostgreSQL:
+
+```sh
+docker compose --profile app up -d --build
+```
+
 ## Endpoints
 
 | Method | Path        | Description                                                 |
