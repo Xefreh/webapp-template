@@ -17,14 +17,16 @@ public class BaseServlet extends HttpServlet {
 	// ObjectMapper is thread-safe once configured: share a single instance
 	private static final ObjectMapper JSON = new ObjectMapper();
 
-	private final Configuration freemarkerCfg;
-
-	public BaseServlet(Configuration freemarkerCfg) {
-		this.freemarkerCfg = freemarkerCfg;
-	}
+	// ServletContext attribute holding the shared FreeMarker Configuration
+	public static final String FREEMARKER_CFG_ATTRIBUTE = Configuration.class.getName();
 
 	protected void renderTemplate(HttpServletResponse response, String name, Map<String, Object> model)
 			throws IOException, ServletException {
+		Configuration freemarkerCfg = (Configuration) getServletContext().getAttribute(FREEMARKER_CFG_ATTRIBUTE);
+		if (freemarkerCfg == null) {
+			throw new ServletException(
+					"No FreeMarker Configuration in ServletContext attribute " + FREEMARKER_CFG_ATTRIBUTE);
+		}
 		Template template = freemarkerCfg.getTemplate(name);
 
 		response.setStatus(HttpServletResponse.SC_OK);

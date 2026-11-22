@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
-import freemarker.template.Configuration;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,8 +18,7 @@ public class UserServlet extends BaseServlet {
 	private final UserRepository userRepository;
 	private final PasswordHasher passwordHasher;
 
-	public UserServlet(Configuration freemarkerCfg, UserRepository userRepository, PasswordHasher passwordHasher) {
-		super(freemarkerCfg);
+	public UserServlet(UserRepository userRepository, PasswordHasher passwordHasher) {
 		this.userRepository = userRepository;
 		this.passwordHasher = passwordHasher;
 	}

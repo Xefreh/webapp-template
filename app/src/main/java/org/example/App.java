@@ -60,6 +60,7 @@ public class App {
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setDefaultRequestCharacterEncoding("UTF-8");
 		context.setDefaultResponseCharacterEncoding("UTF-8");
+		context.setAttribute(BaseServlet.FREEMARKER_CFG_ATTRIBUTE, cfg);
 
 		context.addFilter(LogFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
@@ -67,8 +68,8 @@ public class App {
 		ServletHolder staticHolder = context.addServlet(ResourceServlet.class, "/assets/*");
 		staticHolder.setInitParameter("pathInfoOnly", "false");
 
-		context.addServlet(new ServletHolder(new UserServlet(cfg, userRepository, passwordHasher)), "/users");
-		context.addServlet(new ServletHolder(new HelloServlet(cfg)), "/");
+		context.addServlet(new ServletHolder(new UserServlet(userRepository, passwordHasher)), "/users");
+		context.addServlet(new ServletHolder(new HelloServlet()), "/");
 
 		server.setHandler(context);
 		server.start();
