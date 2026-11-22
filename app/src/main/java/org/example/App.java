@@ -8,7 +8,9 @@ import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee11.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.VirtualThreads;
 import org.eclipse.jetty.util.resource.ResourceFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -44,7 +46,15 @@ public class App {
 		cfg.setFallbackOnNullLoopVariable(false);
 		cfg.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
 
-		Server server = new Server(8080);
+		// Platform threads handle selectors and I/O; request handling (servlets, JDBC calls) runs on virtual threads.
+		QueuedThreadPool threadPool = new QueuedThreadPool();
+		threadPool.setName("jetty");
+		threadPool.setVirtualThreadsExecutor(VirtualThreads.getNamedVirtualThreadsExecutor("jetty-vt-"));
+
+		Server server = new Server(threadPool);
+		ServerConnector connector = new ServerConnector(server);
+		connector.setPort(8080);
+		server.addConnector(connector);
 
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setDefaultRequestCharacterEncoding("UTF-8");
