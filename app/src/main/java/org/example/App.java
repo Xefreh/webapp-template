@@ -46,7 +46,8 @@ public class App {
 		cfg.setFallbackOnNullLoopVariable(false);
 		cfg.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
 
-		// Platform threads handle selectors and I/O; request handling (servlets, JDBC calls) runs on virtual threads.
+		// Platform threads handle selectors and I/O; request handling (servlets, JDBC
+		// calls) runs on virtual threads.
 		QueuedThreadPool threadPool = new QueuedThreadPool();
 		threadPool.setName("jetty");
 		threadPool.setVirtualThreadsExecutor(VirtualThreads.getNamedVirtualThreadsExecutor("jetty-vt-"));
