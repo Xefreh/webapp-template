@@ -34,7 +34,8 @@ public class UserServlet extends BaseServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String name = req.getParameter("name");
-		String email = req.getParameter("email");
+		// Stored lowercase, so that the unique constraint ignores case
+		String email = Email.normalize(req.getParameter("email"));
 		String password = req.getParameter("password");
 
 		if (name == null || name.isBlank() || email == null || email.isBlank()) {
@@ -44,6 +45,10 @@ public class UserServlet extends BaseServlet {
 		if (tooLong(name) || tooLong(email)) {
 			renderJson(resp, HttpServletResponse.SC_BAD_REQUEST,
 					Map.of("error", "name and email must be at most " + MAX_LENGTH + " characters"));
+			return;
+		}
+		if (!Email.isValid(email)) {
+			renderJson(resp, HttpServletResponse.SC_BAD_REQUEST, Map.of("error", "email is not a valid address"));
 			return;
 		}
 		if (password == null || password.isBlank()) {

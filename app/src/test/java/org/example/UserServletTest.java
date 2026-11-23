@@ -100,6 +100,25 @@ class UserServletTest {
 	}
 
 	@Test
+	void storesEmailInLowercase() throws Exception {
+		HttpResponse<String> response = createUser("Ada", "  Ada.Lovelace@Example.ORG ");
+
+		assertEquals(201, response.statusCode(), response.body());
+		assertEquals("ada.lovelace@example.org", JSON.readTree(response.body()).get("email").asText());
+		assertEquals("ada.lovelace@example.org",
+				JSON.readTree(server.get("/users").body()).get(0).get("email").asText());
+	}
+
+	@Test
+	void emailDifferingOnlyByCaseIsAConflict() throws Exception {
+		createUser("Ada", "ada@example.org");
+
+		HttpResponse<String> response = createUser("Other Ada", "ADA@Example.org");
+
+		assertEquals(409, response.statusCode());
+	}
+
+	@Test
 	void acceptsNameOfMaximumLength() throws Exception {
 		// 255 code points but 510 UTF-16 chars: fits in varchar(255)
 		String name = "😀".repeat(255);
