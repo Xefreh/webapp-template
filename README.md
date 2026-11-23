@@ -65,7 +65,13 @@ Tests that need PostgreSQL are skipped when Docker is not available, except on C
 
 ## Configuration
 
-Defaults live in `app/src/main/resources/config.properties`. Every key can be overridden by an environment variable: uppercase, dots replaced by underscores (e.g. `database.url` → `DATABASE_URL`, `server.port` → `SERVER_PORT`).
+The whole configuration lives in a properties file; environment variables are not read. By default the application uses `app/src/main/resources/config.properties`, bundled in the jar and set up for local development. To run it elsewhere, pass another file as argument. It replaces the bundled file entirely, so it must define every key:
+
+```sh
+java -jar app/build/libs/app-all.jar /path/to/config.properties
+```
+
+The `app` service of `compose.yaml` mounts `docker/config.properties` this way. Its only difference from the bundled file is the PostgreSQL host.
 
 ## Project layout
 
@@ -80,4 +86,5 @@ app/src/
 │   └── frontend/                # Vite project, built into static/assets
 │       └── test/                # Vitest tests
 └── test/java/org/example/       # JUnit tests
+docker/config.properties         # Configuration of the app service in compose.yaml
 ```

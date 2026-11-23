@@ -1,7 +1,5 @@
 package org.example;
 
-import java.util.Map;
-
 import org.jdbi.v3.core.Jdbi;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
@@ -25,7 +23,7 @@ final class TestDatabase {
 		container = new PostgreSQLContainer(IMAGE);
 		container.start();
 
-		database = new Database(AppConfig.load(environment()::get));
+		database = new Database(new AppConfig(TestConfig.forDatabase(container)));
 		database.migrate();
 		jdbi = Jdbi.create(database.getDataSource());
 	}
@@ -35,15 +33,6 @@ final class TestDatabase {
 			instance = new TestDatabase();
 		}
 		return instance;
-	}
-
-	/**
-	 * Environment variables pointing the application configuration at the
-	 * container.
-	 */
-	Map<String, String> environment() {
-		return Map.of("DATABASE_URL", container.getJdbcUrl(), "DATABASE_USERNAME", container.getUsername(),
-				"DATABASE_PASSWORD", container.getPassword());
 	}
 
 	Database database() {

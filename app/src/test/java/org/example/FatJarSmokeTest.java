@@ -14,7 +14,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterAll;
@@ -55,11 +55,13 @@ class FatJarSmokeTest {
 		baseUri = URI.create("http://localhost:" + port);
 		output = Files.createTempFile("app-all", ".log");
 
+		// Passed as argument, as compose.yaml does with docker/config.properties
+		Properties config = TestConfig.forDatabase(postgres);
+		config.setProperty("server.port", String.valueOf(port));
+		Path configFile = TestConfig.write(config);
+
 		ProcessBuilder builder = new ProcessBuilder(Path.of(System.getProperty("java.home"), "bin", "java").toString(),
-				"-jar", jar);
-		builder.environment()
-				.putAll(Map.of("DATABASE_URL", postgres.getJdbcUrl(), "DATABASE_USERNAME", postgres.getUsername(),
-						"DATABASE_PASSWORD", postgres.getPassword(), "SERVER_PORT", String.valueOf(port)));
+				"-jar", jar, configFile.toString());
 		builder.redirectErrorStream(true).redirectOutput(output.toFile());
 		app = builder.start();
 

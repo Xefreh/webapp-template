@@ -1,5 +1,6 @@
 package org.example;
 
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.TimeZone;
 
@@ -23,8 +24,15 @@ public class App {
 
 	private static final Logger log = LoggerFactory.getLogger(App.class);
 
+	/**
+	 * @param args optionally, the path of a properties file replacing the bundled
+	 *             config.properties
+	 */
 	public static void main(String[] args) throws Exception {
-		AppConfig appConfig = AppConfig.load();
+		if (args.length > 1) {
+			throw new IllegalArgumentException("Usage: app [config.properties]");
+		}
+		AppConfig appConfig = args.length == 1 ? AppConfig.load(Path.of(args[0])) : AppConfig.load();
 
 		Database database = new Database(appConfig);
 		Runtime.getRuntime().addShutdownHook(new Thread(database::close));
