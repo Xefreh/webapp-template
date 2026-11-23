@@ -61,6 +61,13 @@ val buildFrontend = tasks.register<NpmTask>("buildFrontend") {
     outputs.dir(layout.buildDirectory.dir("frontend"))
 }
 
+val testFrontend = tasks.register<NpmTask>("testFrontend") {
+    description = "Runs the frontend tests with Vitest."
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    dependsOn(tasks.npmInstall)
+    args = listOf("test")
+}
+
 tasks.processResources {
     from(buildFrontend) {
         into("static/assets")
@@ -107,5 +114,5 @@ val smokeTest = tasks.register<Test>("smokeTest") {
 }
 
 tasks.check {
-    dependsOn(smokeTest)
+    dependsOn(testFrontend, smokeTest)
 }
