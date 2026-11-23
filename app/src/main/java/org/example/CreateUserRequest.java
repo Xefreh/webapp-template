@@ -20,8 +20,7 @@ public record CreateUserRequest(String name, String email, String password) {
 					// email() accepts "" (the constructor strips blank values to ""), which only
 					// notBlank() reports
 					c -> c.normalizer(null).notBlank().lessThanOrEqual(MAX_LENGTH).email())
-			.constraint(CreateUserRequest::password, "password", c -> c.notBlank())
-			.build();
+			.constraint(CreateUserRequest::password, "password", c -> c.notBlank()).build();
 
 	/**
 	 * Trims and lowercases the email (Locale.ROOT, independent of the default

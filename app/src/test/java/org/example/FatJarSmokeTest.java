@@ -129,11 +129,9 @@ class FatJarSmokeTest {
 	@Test
 	void ranMigrationsAndCreatesUsers() throws Exception {
 		// Argon2 hashing needs Bouncy Castle, the insert needs the migrated users table
-		HttpResponse<String> created = client.send(
-				HttpRequest.newBuilder(baseUri.resolve("/users"))
-						.header("Content-Type", "application/x-www-form-urlencoded")
-						.POST(HttpRequest.BodyPublishers.ofString("name=Ada&email=ada%40example.org&password=secret"))
-						.build(),
+		HttpResponse<String> created = client.send(HttpRequest.newBuilder(baseUri.resolve("/users"))
+				.header("Content-Type", "application/x-www-form-urlencoded")
+				.POST(HttpRequest.BodyPublishers.ofString("name=Ada&email=ada%40example.org&password=secret")).build(),
 				HttpResponse.BodyHandlers.ofString());
 
 		assertEquals(201, created.statusCode(), created.body() + "\n" + appOutput());

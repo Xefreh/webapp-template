@@ -71,7 +71,10 @@ class LogFilterTest {
 		logger.detachAppender(appender);
 	}
 
-	/** Log events of the request, waiting for them: the filter logs after the response is sent. */
+	/**
+	 * Log events of the request, waiting for them: the filter logs after the
+	 * response is sent.
+	 */
 	private List<ILoggingEvent> events(int expected) throws InterruptedException {
 		long deadline = System.nanoTime() + 5_000_000_000L;
 		while (appender.list.size() < expected && System.nanoTime() < deadline) {
