@@ -92,6 +92,10 @@ tasks.named<Test>("test") {
     useJUnitPlatform {
         excludeTags("smoke")
     }
+    // Checked by AppConfigTest
+    inputs.file(rootProject.file("docker/config.properties"))
+        .withPropertyName("dockerConfig")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 // Tests tagged "smoke" start the shadow jar itself, to catch packaging problems

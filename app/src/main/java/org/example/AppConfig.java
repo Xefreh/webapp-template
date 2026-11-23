@@ -6,68 +6,62 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
+/**
+ * Application configuration, read from a single properties file: the
+ * config.properties bundled on the classpath, or a file given on the command
+ * line that replaces it entirely.
+ */
 public class AppConfig {
 
 	private final Properties props;
-	private final UnaryOperator<String> env;
 
-	/**
-	 * @param props default values
-	 * @param env   environment lookup (variable name to value, or null when unset),
-	 *              {@code System::getenv} outside tests
-	 */
-	AppConfig(Properties props, UnaryOperator<String> env) {
+	AppConfig(Properties props) {
 		this.props = props;
-		this.env = env;
 	}
 
+	/** Loads the config.properties bundled on the classpath. */
 	public static AppConfig load() {
-		return load(System::getenv);
-	}
-
-	static AppConfig load(UnaryOperator<String> env) {
-		Properties props = new Properties();
 		try (InputStream in = AppConfig.class.getResourceAsStream("/config.properties")) {
 			if (in == null) {
 				throw new IllegalStateException("config.properties not found on classpath");
 			}
-			try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
-				props.load(reader);
-			}
+			return new AppConfig(read(in));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to read config.properties", e);
 		}
-		return new AppConfig(props, env);
 	}
 
 	/**
-	 * Returns the value for {@code key}. An environment variable named after the
-	 * key (uppercase, dots replaced by underscores, e.g. database.url ->
-	 * DATABASE_URL) takes precedence over config.properties.
+	 * Loads {@code file} instead of the bundled config.properties: it must define
+	 * every key, nothing is taken from the bundled file.
 	 */
-	public String get(String key) {
-		String value = env.apply(envName(key));
-		if (value == null) {
-			value = props.getProperty(key);
+	public static AppConfig load(Path file) {
+		try (InputStream in = Files.newInputStream(file)) {
+			return new AppConfig(read(in));
+		} catch (IOException e) {
+			throw new UncheckedIOException("Failed to read configuration file " + file, e);
 		}
+	}
+
+	private static Properties read(InputStream in) throws IOException {
+		Properties props = new Properties();
+		try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
+			props.load(reader);
+		}
+		return props;
+	}
+
+	public String get(String key) {
+		String value = props.getProperty(key);
 		if (value == null) {
 			throw new IllegalStateException("Missing config key: " + key);
 		}
 		return value;
-	}
-
-	/**
-	 * Name of the environment variable overriding {@code key}. Locale.ROOT keeps
-	 * the mapping independent of the default locale (in Turkish, "i" would
-	 * otherwise become a dotted capital I).
-	 */
-	static String envName(String key) {
-		return key.toUpperCase(Locale.ROOT).replace('.', '_');
 	}
 
 	public int getInt(String key) {

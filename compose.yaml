@@ -4,6 +4,7 @@ services:
     restart: unless-stopped
     environment:
       # Must match the database.* keys in app/src/main/resources/config.properties
+      # and docker/config.properties
       POSTGRES_DB: webapptemplate
       POSTGRES_USER: webapptemplate
       POSTGRES_PASSWORD: webapptemplate
@@ -24,8 +25,10 @@ services:
     build: .
     profiles: [app]
     restart: unless-stopped
-    environment:
-      DATABASE_URL: jdbc:postgresql://postgres:5432/webapptemplate
+    # Configuration file replacing the one bundled in the jar (PostgreSQL host "postgres")
+    command: ["/app/config.properties"]
+    volumes:
+      - ./docker/config.properties:/app/config.properties:ro
     ports:
       - "8080:8080"
     depends_on:
