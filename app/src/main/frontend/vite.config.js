@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  test: {
+    // Lit components need a DOM
+    environment: 'happy-dom'
+  },
   build: {
     outDir: '../../../build/frontend',
     emptyOutDir: true,
