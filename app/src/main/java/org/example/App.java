@@ -73,7 +73,9 @@ public class App {
 		staticHolder.setInitParameter("pathInfoOnly", "false");
 
 		context.addServlet(new ServletHolder(new UserServlet(userRepository, passwordHasher)), "/users");
-		context.addServlet(new ServletHolder(new HelloServlet()), "/");
+		// "" matches the context root only ("/" would make it the default servlet and
+		// answer every unknown path with the hello page)
+		context.addServlet(new ServletHolder(new HelloServlet()), "");
 
 		server.setHandler(context);
 		return server;
