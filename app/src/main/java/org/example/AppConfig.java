@@ -6,18 +6,31 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class AppConfig {
 
 	private final Properties props;
+	private final UnaryOperator<String> env;
 
-	private AppConfig(Properties props) {
+	/**
+	 * @param props default values
+	 * @param env   environment lookup (variable name to value, or null when unset),
+	 *              {@code System::getenv} outside tests
+	 */
+	AppConfig(Properties props, UnaryOperator<String> env) {
 		this.props = props;
+		this.env = env;
 	}
 
 	public static AppConfig load() {
+		return load(System::getenv);
+	}
+
+	static AppConfig load(UnaryOperator<String> env) {
 		Properties props = new Properties();
 		try (InputStream in = AppConfig.class.getResourceAsStream("/config.properties")) {
 			if (in == null) {
@@ -29,7 +42,7 @@ public class AppConfig {
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to read config.properties", e);
 		}
-		return new AppConfig(props);
+		return new AppConfig(props, env);
 	}
 
 	/**
@@ -38,7 +51,7 @@ public class AppConfig {
 	 * DATABASE_URL) takes precedence over config.properties.
 	 */
 	public String get(String key) {
-		String value = System.getenv(key.toUpperCase().replace('.', '_'));
+		String value = env.apply(envName(key));
 		if (value == null) {
 			value = props.getProperty(key);
 		}
@@ -46,6 +59,15 @@ public class AppConfig {
 			throw new IllegalStateException("Missing config key: " + key);
 		}
 		return value;
+	}
+
+	/**
+	 * Name of the environment variable overriding {@code key}. Locale.ROOT keeps
+	 * the mapping independent of the default locale (in Turkish, "i" would
+	 * otherwise become a dotted capital I).
+	 */
+	static String envName(String key) {
+		return key.toUpperCase(Locale.ROOT).replace('.', '_');
 	}
 
 	public int getInt(String key) {
