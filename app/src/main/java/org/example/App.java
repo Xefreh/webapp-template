@@ -31,19 +31,24 @@ public class App {
 
 		database.migrate();
 
-		Jdbi jdbi = Jdbi.create(database.getDataSource());
-		UserRepository userRepository = new UserRepository(jdbi);
+		UserRepository userRepository = new UserRepository(Jdbi.create(database.getDataSource()));
+
+		Server server = createServer(userRepository, appConfig.getInt("server.port"));
+		server.start();
+
+		int port = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
+		log.info("Server started at http://localhost:{}/", port);
+
+		server.join();
+	}
+
+	/**
+	 * Builds the Jetty server with every filter and servlet, without starting it.
+	 *
+	 * @param port the port to listen on, 0 for any free port
+	 */
+	static Server createServer(UserRepository userRepository, int port) {
 		PasswordHasher passwordHasher = new PasswordHasher();
-
-		Configuration cfg = new Configuration(Configuration.VERSION_2_3_35);
-
-		cfg.setClassForTemplateLoading(App.class, "/templates");
-		cfg.setDefaultEncoding("UTF-8");
-		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-		cfg.setLogTemplateExceptions(false);
-		cfg.setWrapUncheckedExceptions(true);
-		cfg.setFallbackOnNullLoopVariable(false);
-		cfg.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
 
 		// Platform threads handle selectors and I/O; request handling (servlets, JDBC
 		// calls) runs on virtual threads.
@@ -53,13 +58,13 @@ public class App {
 
 		Server server = new Server(threadPool);
 		ServerConnector connector = new ServerConnector(server);
-		connector.setPort(8080);
+		connector.setPort(port);
 		server.addConnector(connector);
 
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setDefaultRequestCharacterEncoding("UTF-8");
 		context.setDefaultResponseCharacterEncoding("UTF-8");
-		context.setAttribute(BaseServlet.FREEMARKER_CFG_ATTRIBUTE, cfg);
+		context.setAttribute(BaseServlet.FREEMARKER_CFG_ATTRIBUTE, freemarkerConfiguration());
 
 		context.addFilter(LogFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
@@ -71,11 +76,19 @@ public class App {
 		context.addServlet(new ServletHolder(new HelloServlet()), "/");
 
 		server.setHandler(context);
-		server.start();
+		return server;
+	}
 
-		int port = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
-		log.info("Server started at http://localhost:{}/", port);
+	static Configuration freemarkerConfiguration() {
+		Configuration cfg = new Configuration(Configuration.VERSION_2_3_35);
 
-		server.join();
+		cfg.setClassForTemplateLoading(App.class, "/templates");
+		cfg.setDefaultEncoding("UTF-8");
+		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+		cfg.setLogTemplateExceptions(false);
+		cfg.setWrapUncheckedExceptions(true);
+		cfg.setFallbackOnNullLoopVariable(false);
+		cfg.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
+		return cfg;
 	}
 }
