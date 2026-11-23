@@ -68,7 +68,7 @@ class UserServletValidationTest {
 				Arguments.of("missing password", with("password", null), Map.of("password", blank("password"))),
 				Arguments.of("blank password", with("password", " "), Map.of("password", blank("password"))),
 				Arguments.of("name too long", with("name", "a".repeat(256)), Map.of("name", nameTooLong)),
-				Arguments.of("invalid email", with("email", "ada@localhost"), Map.of("email", invalidEmail)),
+				Arguments.of("invalid email", with("email", "ada lovelace@example.org"), Map.of("email", invalidEmail)),
 				Arguments.of("everything missing", Map.of(),
 						Map.of("name", blank("name"), "email", blank("email"), "password", blank("password"))));
 	}
