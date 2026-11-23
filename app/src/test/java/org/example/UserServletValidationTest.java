@@ -52,6 +52,7 @@ class UserServletValidationTest {
 	static Stream<Arguments> invalidForms() {
 		String required = "name and email are required";
 		String tooLong = "name and email must be at most 255 characters";
+		String invalidEmail = "email is not a valid address";
 		return Stream.of(Arguments.of("missing name", with("name", null), required),
 				Arguments.of("blank name", with("name", "   "), required),
 				Arguments.of("missing email", with("email", null), required),
@@ -61,7 +62,12 @@ class UserServletValidationTest {
 				Arguments.of("name too long", with("name", "a".repeat(256)), tooLong),
 				Arguments.of("email too long", with("email", "a".repeat(244) + "@example.org"), tooLong),
 				// 256 code points: each emoji is two UTF-16 chars but one varchar character
-				Arguments.of("name too long in code points", with("name", "😀".repeat(256)), tooLong));
+				Arguments.of("name too long in code points", with("name", "😀".repeat(256)), tooLong),
+				Arguments.of("blank email", with("email", "   "), required),
+				Arguments.of("email without @", with("email", "ada.example.org"), invalidEmail),
+				Arguments.of("email without domain", with("email", "ada@"), invalidEmail),
+				Arguments.of("email with a single domain label", with("email", "ada@localhost"), invalidEmail),
+				Arguments.of("email with spaces", with("email", "ada lovelace@example.org"), invalidEmail));
 	}
 
 	@ParameterizedTest(name = "{0}")
