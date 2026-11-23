@@ -16,7 +16,8 @@ public class UserRepository {
 
 	public List<User> list() {
 		// The password hash is deliberately not selected: listing users never needs it
-		return jdbi.withHandle(handle -> handle.createQuery("SELECT id, name, email FROM " + TABLE_NAME)
+		return jdbi.withHandle(handle -> handle
+				.createQuery("SELECT id, name, email FROM " + TABLE_NAME + " ORDER BY id")
 				.map((rs, ctx) -> new User(rs.getInt("id"), rs.getString("name"), rs.getString("email"), null)).list());
 	}
 

@@ -2,6 +2,8 @@ package org.example;
 
 import javax.sql.DataSource;
 
+import org.flywaydb.core.Flyway;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -21,6 +23,11 @@ public class Database implements AutoCloseable {
 		hikariConfig.addDataSourceProperty("ApplicationName", appConfig.get("database.applicationName"));
 
 		this.dataSource = new HikariDataSource(hikariConfig);
+	}
+
+	/** Applies the pending Flyway migrations from classpath:migrations. */
+	public void migrate() {
+		Flyway.configure().dataSource(dataSource).locations("classpath:migrations").load().migrate();
 	}
 
 	public DataSource getDataSource() {
