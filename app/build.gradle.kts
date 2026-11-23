@@ -28,6 +28,9 @@ dependencies {
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
+    testImplementation(platform(libs.testcontainers.bom))
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.testcontainers.postgresql)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
@@ -74,4 +77,6 @@ tasks.shadowJar {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    // Testcontainers loads native code through JNA
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
 }

@@ -11,7 +11,6 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.VirtualThreads;
 import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ public class App {
 		Database database = new Database(appConfig);
 		Runtime.getRuntime().addShutdownHook(new Thread(database::close));
 
-		Flyway.configure().dataSource(database.getDataSource()).locations("classpath:migrations").load().migrate();
+		database.migrate();
 
 		Jdbi jdbi = Jdbi.create(database.getDataSource());
 		UserRepository userRepository = new UserRepository(jdbi);
