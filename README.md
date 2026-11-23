@@ -40,27 +40,44 @@ To build the Docker image and run it with PostgreSQL:
 docker compose --profile app up -d --build
 ```
 
+## Tests
+
+```sh
+./gradlew check
+```
+
+`check` runs:
+
+- `test`: JUnit tests under `app/src/test/java`. Unit tests, HTTP tests against the real server on a free port, and tests against PostgreSQL started with [Testcontainers](https://testcontainers.com/) (`@DatabaseTest`);
+- `smokeTest`: starts the shadow jar against an empty PostgreSQL, to catch packaging problems;
+- `testFrontend`: [Vitest](https://vitest.dev/) tests under `app/src/main/frontend/test`.
+
+Tests that need PostgreSQL are skipped when Docker is not available, except on CI (`CI` environment variable set), where they fail instead. The GitHub Actions workflow `tests.yml` runs `./gradlew check` on every pull request.
+
 ## Endpoints
 
 | Method | Path        | Description                                                 |
 |--------|-------------|-------------------------------------------------------------|
-| GET    | `/`         | Hello page rendered with FreeMarker                         |
+| GET    | `/`         | Hello page rendered with FreeMarker (other paths: 404)      |
 | GET    | `/users`    | List users as JSON                                          |
 | POST   | `/users`    | Create a user (form parameters `name`, `email`, `password`) |
 | GET    | `/assets/*` | Frontend assets built by Vite                               |
 
 ## Configuration
 
-Defaults live in `app/src/main/resources/config.properties`. Every key can be overridden by an environment variable: uppercase, dots replaced by underscores (e.g. `database.url` → `DATABASE_URL`).
+Defaults live in `app/src/main/resources/config.properties`. Every key can be overridden by an environment variable: uppercase, dots replaced by underscores (e.g. `database.url` → `DATABASE_URL`, `server.port` → `SERVER_PORT`).
 
 ## Project layout
 
 ```
-app/src/main/
-├── java/org/example/        # Server, servlets, repository, configuration
-├── resources/
-│   ├── config.properties    # Default configuration
-│   ├── migrations/          # Flyway SQL migrations
-│   └── templates/           # FreeMarker templates
-└── frontend/                # Vite project, built into static/assets
+app/src/
+├── main/
+│   ├── java/org/example/        # Server, servlets, repository, configuration
+│   ├── resources/
+│   │   ├── config.properties    # Default configuration
+│   │   ├── migrations/          # Flyway SQL migrations
+│   │   └── templates/           # FreeMarker templates
+│   └── frontend/                # Vite project, built into static/assets
+│       └── test/                # Vitest tests
+└── test/java/org/example/       # JUnit tests
 ```
