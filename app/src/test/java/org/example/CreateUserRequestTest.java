@@ -67,8 +67,7 @@ class CreateUserRequestTest {
 	void nameAndEmailAreLimitedTo255CodePoints() {
 		assertEquals(Map.of(), violations("a".repeat(255), "a".repeat(243) + "@example.org", "secret"));
 
-		Map<String, List<String>> violations = violations("a".repeat(256), "a".repeat(244) + "@example.org",
-				"secret");
+		Map<String, List<String>> violations = violations("a".repeat(256), "a".repeat(244) + "@example.org", "secret");
 
 		assertEquals(List.of("The size of \"name\" must be less than or equal to 255. The given size is 256"),
 				violations.get("name"));
@@ -88,8 +87,8 @@ class CreateUserRequestTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { "ada@example.org", "ada.lovelace@example.org", "ada+newsletter@example.org",
-			"a@b.co", "o'brien@example.org", "ada_l-1@mail.example.co.uk",
+	@ValueSource(strings = { "ada@example.org", "ada.lovelace@example.org", "ada+newsletter@example.org", "a@b.co",
+			"o'brien@example.org", "ada_l-1@mail.example.co.uk",
 			// YAVI's email() only checks the general shape of the address
 			"ada@localhost", "ada@1.2.3.4", "zoë@exämple.org" })
 	void acceptsValidEmails(String email) {

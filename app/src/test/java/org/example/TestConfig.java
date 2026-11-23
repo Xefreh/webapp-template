@@ -13,7 +13,10 @@ import java.util.Properties;
 
 import org.testcontainers.containers.JdbcDatabaseContainer;
 
-/** Configuration for tests: the bundled config.properties with some keys replaced. */
+/**
+ * Configuration for tests: the bundled config.properties with some keys
+ * replaced.
+ */
 final class TestConfig {
 
 	private TestConfig() {
@@ -39,7 +42,10 @@ final class TestConfig {
 		return props;
 	}
 
-	/** Writes {@code props} to a new temporary file, as AppConfig.load(Path) reads it. */
+	/**
+	 * Writes {@code props} to a new temporary file, as AppConfig.load(Path) reads
+	 * it.
+	 */
 	static Path write(Properties props) throws IOException {
 		Path file = Files.createTempFile("config", ".properties");
 		file.toFile().deleteOnExit();

@@ -44,10 +44,8 @@ final class TestServer implements AutoCloseable {
 	}
 
 	HttpResponse<String> postForm(String path, Map<String, String> form) throws IOException, InterruptedException {
-		String body = form.entrySet().stream()
-				.map(e -> URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8) + "="
-						+ URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
-				.collect(Collectors.joining("&"));
+		String body = form.entrySet().stream().map(e -> URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8) + "="
+				+ URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8)).collect(Collectors.joining("&"));
 		return send(HttpRequest.newBuilder(uri(path)).header("Content-Type", "application/x-www-form-urlencoded")
 				.POST(HttpRequest.BodyPublishers.ofString(body)).build());
 	}

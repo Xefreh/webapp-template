@@ -82,9 +82,9 @@ class UserServletTest {
 	void storesArgon2HashOfPassword() throws Exception {
 		createUser("Ada", "ada@example.org");
 
-		String hash = db.jdbi().withHandle(handle -> handle
-				.createQuery("SELECT password_hash FROM users WHERE email = 'ada@example.org'").mapTo(String.class)
-				.one());
+		String hash = db.jdbi().withHandle(
+				handle -> handle.createQuery("SELECT password_hash FROM users WHERE email = 'ada@example.org'")
+						.mapTo(String.class).one());
 
 		assertTrue(new PasswordHasher().matches("secret", hash));
 	}
