@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -16,7 +17,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/** Invalid POST /users requests, rejected before reaching the database. */
+/**
+ * Invalid POST /users requests, rejected before reaching the database. The
+ * validation rules themselves are tested by CreateUserRequestTest.
+ */
 class UserServletValidationTest {
 
 	private static final ObjectMapper JSON = new ObjectMapper();
@@ -49,33 +53,33 @@ class UserServletValidationTest {
 		return form;
 	}
 
+	private static List<String> blank(String field) {
+		return List.of("\"" + field + "\" must not be blank");
+	}
+
 	static Stream<Arguments> invalidForms() {
-		String required = "name and email are required";
-		String tooLong = "name and email must be at most 255 characters";
-		String invalidEmail = "email is not a valid address";
-		return Stream.of(Arguments.of("missing name", with("name", null), required),
-				Arguments.of("blank name", with("name", "   "), required),
-				Arguments.of("missing email", with("email", null), required),
-				Arguments.of("empty email", with("email", ""), required),
-				Arguments.of("missing password", with("password", null), "password is required"),
-				Arguments.of("blank password", with("password", " "), "password is required"),
-				Arguments.of("name too long", with("name", "a".repeat(256)), tooLong),
-				Arguments.of("email too long", with("email", "a".repeat(244) + "@example.org"), tooLong),
-				// 256 code points: each emoji is two UTF-16 chars but one varchar character
-				Arguments.of("name too long in code points", with("name", "😀".repeat(256)), tooLong),
-				Arguments.of("blank email", with("email", "   "), required),
-				Arguments.of("email without @", with("email", "ada.example.org"), invalidEmail),
-				Arguments.of("email without domain", with("email", "ada@"), invalidEmail),
-				Arguments.of("email with a single domain label", with("email", "ada@localhost"), invalidEmail),
-				Arguments.of("email with spaces", with("email", "ada lovelace@example.org"), invalidEmail));
+		List<String> nameTooLong = List
+				.of("The size of \"name\" must be less than or equal to 255. The given size is 256");
+		List<String> invalidEmail = List.of("\"email\" must be a valid email address");
+		return Stream.of(Arguments.of("missing name", with("name", null), Map.of("name", blank("name"))),
+				Arguments.of("blank name", with("name", "   "), Map.of("name", blank("name"))),
+				Arguments.of("missing email", with("email", null), Map.of("email", blank("email"))),
+				Arguments.of("blank email", with("email", "  "), Map.of("email", blank("email"))),
+				Arguments.of("missing password", with("password", null), Map.of("password", blank("password"))),
+				Arguments.of("blank password", with("password", " "), Map.of("password", blank("password"))),
+				Arguments.of("name too long", with("name", "a".repeat(256)), Map.of("name", nameTooLong)),
+				Arguments.of("invalid email", with("email", "ada@localhost"), Map.of("email", invalidEmail)),
+				Arguments.of("everything missing", Map.of(),
+						Map.of("name", blank("name"), "email", blank("email"), "password", blank("password"))));
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("invalidForms")
-	void rejectsInvalidForm(String description, Map<String, String> form, String error) throws Exception {
+	void rejectsInvalidForm(String description, Map<String, String> form, Map<String, List<String>> errors)
+			throws Exception {
 		HttpResponse<String> response = server.postForm("/users", form);
 
 		assertEquals(400, response.statusCode());
-		assertEquals(Map.of("error", error), JSON.readValue(response.body(), Map.class));
+		assertEquals(Map.of("errors", errors), JSON.readValue(response.body(), Map.class));
 	}
 }

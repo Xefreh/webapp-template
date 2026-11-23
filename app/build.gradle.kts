@@ -21,6 +21,7 @@ dependencies {
     implementation(libs.postgresql)
     implementation(libs.jackson.databind)
     implementation(libs.spring.security.crypto)
+    implementation(libs.yavi)
     runtimeOnly(libs.bcprov) // required by Argon2PasswordEncoder
     
     runtimeOnly(libs.logback.classic)

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import am.ik.yavi.core.ConstraintViolations;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -55,5 +56,13 @@ public class BaseServlet extends HttpServlet {
 		response.setContentType("application/json");
 		response.setContentLength(body.length);
 		response.getOutputStream().write(body);
+	}
+
+	/**
+	 * Answers 400 with the violation messages grouped by property name:
+	 * {@code {"errors": {"email": ["..."]}}}.
+	 */
+	protected void renderViolations(HttpServletResponse response, ConstraintViolations violations) throws IOException {
+		renderJson(response, HttpServletResponse.SC_BAD_REQUEST, Map.of("errors", violations.messagesByName()));
 	}
 }

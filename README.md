@@ -63,6 +63,12 @@ Tests that need PostgreSQL are skipped when Docker is not available, except on C
 | POST   | `/users`    | Create a user (form parameters `name`, `email`, `password`) |
 | GET    | `/assets/*` | Frontend assets built by Vite                               |
 
+Request data is validated with [YAVI](https://github.com/making/yavi): each form has a record declaring its rules (see `CreateUserRequest`). Invalid requests get a 400 with the messages grouped by field:
+
+```json
+{"errors": {"email": ["\"email\" must be a valid email address"]}}
+```
+
 ## Configuration
 
 The whole configuration lives in a properties file; environment variables are not read. By default the application uses `app/src/main/resources/config.properties`, bundled in the jar and set up for local development. To run it elsewhere, pass another file as argument. It replaces the bundled file entirely, so it must define every key:

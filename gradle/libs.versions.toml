@@ -16,6 +16,7 @@ postgresql = "42.7.14"
 jackson = "2.23.0"
 spring-security-crypto = "7.1.2"
 bouncycastle = "1.87"
+yavi = "0.18.1"
 
 [libraries]
 jetty-ee11-servlet = { module = "org.eclipse.jetty.ee11:jetty-ee11-servlet", version.ref = "jetty" }
@@ -36,4 +37,5 @@ jdbi3-core = { module = "org.jdbi:jdbi3-core", version.ref = "jdbi" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 spring-security-crypto = { module = "org.springframework.security:spring-security-crypto", version.ref = "spring-security-crypto" }
+yavi = { module = "am.ik.yavi:yavi", version.ref = "yavi" }
 bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
