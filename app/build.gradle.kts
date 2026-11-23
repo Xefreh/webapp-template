@@ -76,8 +76,36 @@ tasks.shadowJar {
     mergeServiceFiles()
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
+tasks.withType<Test>().configureEach {
     // Testcontainers loads native code through JNA
     jvmArgs("--enable-native-access=ALL-UNNAMED")
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform {
+        excludeTags("smoke")
+    }
+}
+
+// Tests tagged "smoke" start the shadow jar itself, to catch packaging problems
+// (e.g. service files lost in the merge) that the classpath of the test task hides.
+val smokeTest = tasks.register<Test>("smokeTest") {
+    description = "Runs the shadow jar against PostgreSQL and checks that it serves requests."
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    useJUnitPlatform {
+        includeTags("smoke")
+    }
+
+    val jar = tasks.shadowJar.flatMap { it.archiveFile }
+    inputs.file(jar).withPropertyName("jar")
+    jvmArgumentProviders.add(CommandLineArgumentProvider {
+        listOf("-DsmokeTest.jar=${jar.get().asFile.absolutePath}")
+    })
+    shouldRunAfter(tasks.test)
+}
+
+tasks.check {
+    dependsOn(smokeTest)
 }
